@@ -98,8 +98,13 @@ window.onload = () => {
 
     if ('geolocation' in navigator) {
         geolocation = navigator.geolocation;
+        const options = {
+            enableHighAccuracy: true,
+            maximumAge: 30000,
+            timeout: 27000
+        }
         watchID = geolocation.watchPosition(
-            updatePosition, handleErr);
+            updatePosition, handleErr, options);
     }
 }
 function locate(position) {
