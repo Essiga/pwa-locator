@@ -60,6 +60,9 @@ function updatePosition(position) {
     ranger.setRadius(coords.accuracy);
 }
 
+var geolocation;
+var watchID;
+
 /* setup component */
 window.onload = () => {
     const cameraButton = document.getElementById(CAMERA_INPUT_ID);
@@ -86,4 +89,24 @@ window.onload = () => {
         });
     }
 
+    if ('geolocation' in navigator) {
+        geolocation = navigator.geolocation;
+        watchID = geolocation.watchPosition(
+            updatePosition, handleErr);
+    }
 }
+function locate(position) {
+    const c = position.coords;
+    updatePosition(position);
+    console.debug(
+        `my position: lat=${c.latitude} lng=${c.longitude}`);
+}
+function handleErr(err) {
+    console.error(err.message);
+}
+
+window.onbeforeunload = (event) => {
+    if (geolocation) {
+        geolocation.clearWatch(watchID);
+    }
+};
