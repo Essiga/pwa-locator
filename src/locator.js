@@ -1,4 +1,8 @@
 import cameraImage from './camera.svg';
+import markerPath2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerPath from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import arrowUpImage from './arrow-up-circle.svg';
 
 const COORD_FORMATTER = Intl.NumberFormat('de-DE', { minimumFractionDigits: 6, maximumFractionDigits: 6, minimumIntegerDigits: 3, style: 'unit', unit: 'degree' });
 const DIST_FORMATTER = Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1, style: 'unit', unit: 'meter' });
@@ -12,6 +16,8 @@ const CAMERA_INPUT_ID = 'camera';
 var map;
 var ranger;
 export var ll;
+let headingMarker;
+let headingImage;
 
 function isTouchDevice() {
     return (('ontouchstart' in window) ||
@@ -32,6 +38,37 @@ function configureMap(latLngArray) {
         attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
     ranger = L.circle(latLngArray, { radius: 20.0 }).addTo(map);
+
+    headingImage = new Image(32, 32);
+    headingImage.src = arrowUpImage;
+    const headingIcon = L.divIcon({html: headingImage, iconSize: [32, 32], className: ''});
+    headingMarker = L.marker([0, 0], {icon: headingIcon});
+
+    const markerIcon = new L.Icon.Default({
+        iconUrl: markerPath,
+        iconRetinaUrl: markerPath2x,
+        shadowUrl: markerShadow
+    });
+
+    let images = localStorage.getItem("images");
+    if (images == null) {
+        images = JSON.stringify({});
+    }
+    images = JSON.parse(images);
+
+    Object.keys(images).forEach((key) => {
+        let coords = key.split(',');
+        let latitude = coords[0];
+        let longitude = coords[1];
+        let photo = images[key];
+
+        L.marker([latitude, longitude], {icon: markerIcon}).addTo(map)
+            .bindPopup(`
+                <div class="popup-container">
+                    <img src='${photo}' width='200px' alt="Marker Image">          
+                </div>
+            `);
+    });
 }
 
 function updatePosition(position) {
