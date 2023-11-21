@@ -11,6 +11,7 @@ const CAMERA_INPUT_ID = 'camera';
 //map state
 var map;
 var ranger;
+export var ll;
 
 function isTouchDevice() {
     return (('ontouchstart' in window) ||
@@ -23,6 +24,7 @@ function configureMap(latLngArray) {
     if (isTouchDevice()) {
         map.removeControl(map.zoomControl);
     }
+    console.log("test");
     map.attributionControl.setPosition('bottomleft');
 
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -33,6 +35,8 @@ function configureMap(latLngArray) {
 }
 
 function updatePosition(position) {
+    const cameraButton = document.getElementById(CAMERA_INPUT_ID);
+    cameraButton.disabled = false;
     const locatorLeftDiv = document.getElementById(LOCATION_LEFT_ID);
     const locatorMiddleDiv = document.getElementById(LOCATION_MIDDLE_ID);
 
@@ -56,10 +60,11 @@ function updatePosition(position) {
             <dt>SPD</dt>
             <dd>${coords.speed ? DIST_FORMATTER.format(coords.speed) : '-'}</dd>
         </dl>`;
-    var ll = [coords.latitude, coords.longitude];
+    ll = [coords.latitude, coords.longitude];
 
     map.setView(ll);
-
+    localStorage.setItem("lastCoordinates", ll);
+    console.log("lastCoordinates: "+ ll);
     ranger.setLatLng(ll);
     ranger.setRadius(coords.accuracy);
 }
@@ -74,9 +79,16 @@ window.onload = () => {
 
     //setup UI
     cameraButton.src = cameraImage;
+    cameraButton.addEventListener("click", () => {
+
+       console.log("test button");
+       location.href = "/camera.html"
+    });
 
     //init leaflet
+
     configureMap([47.406653, 9.744844]);
+    //configureMap();
 
     //init footer
     updatePosition({ coords: { latitude: 47.406653, longitude: 9.744844, altitude: 440, accuracy: 40, heading: 45, speed: 1.8 } });
@@ -100,7 +112,7 @@ window.onload = () => {
         geolocation = navigator.geolocation;
         const options = {
             enableHighAccuracy: true,
-            maximumAge: 30000,
+            maximumAge: 1000,
             timeout: 27000
         }
         watchID = geolocation.watchPosition(
@@ -113,7 +125,10 @@ function locate(position) {
     console.debug(
         `my position: lat=${c.latitude} lng=${c.longitude}`);
 }
+
 function handleErr(err) {
+    const cameraButton = document.getElementById(CAMERA_INPUT_ID);
+    cameraButton.disabled = true;
     console.error(err.message);
 }
 
