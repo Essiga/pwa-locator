@@ -76,13 +76,13 @@ function takePicture(event) {
     const wHalf = width / 2;
 
     // transparent background
-    context.fillStyle = 'rgba(255, 255, 29, 0.5)';
-    context.fillRect(wHalf - textWidth -20, height - 148, textWidth * 2 + 40, 36);
+    context.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    context.fillRect(wHalf - textWidth -2, height - 50, textWidth * 2 + 4, 36);
 
     context.fillStyle = 'black';
     context.textAlign = 'center';
     context.font = '26pt consolas';
-    context.fillText(coordinateText, wHalf, height - 122, textWidth * 2);
+    context.fillText(coordinateText, wHalf, height - 22, textWidth * 2);
 
 
     canvas.convertToBlob({ type: 'image/jpeg' }).then(
